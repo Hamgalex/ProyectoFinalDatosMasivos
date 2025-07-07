@@ -2,28 +2,23 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 import ast
 
-# Cargar el CSV original
+# Cargar CSV original
 df = pd.read_csv("../book_downloader/1001_books_detailed.csv")
-
-# Llenar descripciones faltantes
 df["description"] = df["description"].fillna("")
 
-# Lista de descripciones
-descriptions = df["description"].tolist()
-
-# Cargar modelo BERT multilingüe
-print("Cargando modelo")
+# Modelo
 model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 
 # Generar embeddings
 print("🔄 Generando embeddings...")
-embeddings = model.encode(descriptions)
+embeddings = model.encode(df["description"].tolist(), convert_to_numpy=True)
 
-# Convertir cada embedding (array) a una lista para guardar en CSV
-df["embedding"] = [emb.tolist() for emb in embeddings]
+# Guardar como listas normales de float (no np.float32)
+df["embedding"] = [list(map(float, emb)) for emb in embeddings]
 
-# Guardar CSV con embeddings
-output_file = "1001_books_with_embeddings.csv"
-df.to_csv(output_file, index=False, encoding="utf-8")
+# Guardar a CSV
+df.to_csv("1001_books_with_embeddings.csv", index=False)
+print("✅ Guardado CSV con embeddings limpios.")
 
-print(f"✅ Embeddings guardados en {output_file}")
+
+
