@@ -1,9 +1,12 @@
 import requests
 import csv
 import time
+import os
 
-INPUT_FILE = "1001_books_list.csv"
-OUTPUT_FILE = "1001_books_detailed.csv"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE = os.path.join(BASE_DIR, "1001_books_list.csv")
+OUTPUT_FILE = os.path.join(BASE_DIR,"1001_books_detailed.csv")
+
 API_URL = "https://www.googleapis.com/books/v1/volumes"
 API_KEY = None  # Reemplaza con tu API key si tienes una
 
@@ -33,7 +36,7 @@ def enrich_books():
         reader = csv.DictReader(f)
         for i, row in enumerate(reader, start=1):
             title, author = row["title"], row["author"]
-            print(f"🔍 [{i}] Buscando: {title} by {author}")
+            print(f" [{i}] Buscando: {title} by {author}")
 
             info = search_book(title, author)
             time.sleep(0.1)
@@ -52,7 +55,7 @@ def enrich_books():
                     "publishedDate": info.get("publishedDate", "")
                 })
             else:
-                print(f"⚠️ No se encontró info para: {title}")
+                print(f"No se encontró info para: {title}")
                 enriched.append({
                     "title": title,
                     "author": author,
@@ -73,7 +76,7 @@ def save_to_csv(data, filename=OUTPUT_FILE):
         writer = csv.DictWriter(f, fieldnames=data[0].keys())
         writer.writeheader()
         writer.writerows(data)
-    print(f"\n✅ CSV guardado como: {filename}")
+    print(f"\nCSV guardado como: {filename}")
 
 if __name__ == "__main__":
     books_detailed = enrich_books()

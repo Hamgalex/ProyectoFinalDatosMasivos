@@ -1,10 +1,14 @@
+import os
 import pandas as pd
 import numpy as np
 from sentence_transformers import util
 import ast
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE = os.path.join(BASE_DIR, "1001_books_with_embeddings.csv")
+
 # Cargar el DataFrame con embeddings
-df = pd.read_csv("1001_books_with_embeddings.csv")
+df = pd.read_csv(INPUT_FILE)
 df["description"] = df["description"].fillna("")
 
 # Convertir los embeddings de string a array
@@ -17,7 +21,7 @@ embedding_matrix = np.vstack(df["embedding"].values)
 def recommend_books(book_title, top_n=5):
     matches = df[df["title"].str.lower() == book_title.lower()]
     if matches.empty:
-        print(f"❌ No se encontró el libro: {book_title}")
+        print(f" No se encontró el libro: {book_title}")
         return
 
     idx = matches.index[0]
@@ -26,16 +30,16 @@ def recommend_books(book_title, top_n=5):
     similarities = util.cos_sim(query_embedding, embedding_matrix)[0].cpu().numpy()
     similar_indices = np.argsort(similarities)[::-1][1 : top_n + 1]
 
-    print(f"\n📚 Recomendaciones similares a: {df.loc[idx, 'title']}\n")
+    print(f"\n Recomendaciones similares a: {df.loc[idx, 'title']}\n")
     for i in similar_indices:
         desc = df.loc[i, 'description']
         if isinstance(desc, float):
             desc = ""
-        print(f"🔸 {df.loc[i, 'title']} — {df.loc[i, 'author']}")
-        print(f"    📖 {desc[:150]}...")
-        print(f"    🧠 Similitud: {similarities[i]:.4f}\n")
+        print(f" {df.loc[i, 'title']} — {df.loc[i, 'author']}")
+        print(f"     {desc[:150]}...")
+        print(f"     Similitud: {similarities[i]:.4f}\n")
 
 # Ejecutar si se llama directamente
 if __name__ == "__main__":
-    query = input("🔎 Ingresa el título de un libro: ")
+    query = input(" Ingresa el título de un libro: ")
     recommend_books(query, top_n=5)

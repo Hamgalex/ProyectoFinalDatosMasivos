@@ -18,7 +18,7 @@ def get_books():
         raise ValueError("No se encontró la lista <ol> en el contenido.")
 
     items = ol.find_all("li")
-    print(f"🔎 Se encontraron {len(items)} libros.")
+    print(f" Se encontraron {len(items)} libros.")
 
     books = []
     for item in items:
@@ -38,11 +38,11 @@ def get_books():
     return books
 
 def save_to_csv(books, filename="1001_books_list.csv"):
-    with open(filename, mode="w", encoding="utf-8-sig", newline="") as f:  # ⚠️ utf-8-sig para Excel
+    with open(filename, mode="w", encoding="utf-8-sig", newline="") as f:  #  utf-8-sig para Excel
         writer = csv.DictWriter(f, fieldnames=["title", "author"])
         writer.writeheader()
         writer.writerows(books)
-    print(f"✅ CSV guardado como: {filename}")
+    print(f"CSV guardado como: {filename}")
 
 if __name__ == "__main__":
     books = get_books()
