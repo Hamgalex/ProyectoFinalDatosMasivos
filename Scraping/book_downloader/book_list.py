@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 import csv
 import re
 import ftfy
+import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 URL = "https://notesfromabooknerd.com/reading-list-challenges/1001-books-you-must-read-before-you-die/"
 
 def get_books():
@@ -37,7 +39,12 @@ def get_books():
 
     return books
 
-def save_to_csv(books, filename="1001_books_list.csv"):
+def save_to_csv(books, filename="1001_books_list.csv", folder_path = BASE_DIR):
+        # Si se pasa una ruta, la combina con el nombre del archivo
+    if folder_path:
+        os.makedirs(folder_path, exist_ok=True)
+        filename = os.path.join(folder_path, filename)
+        
     with open(filename, mode="w", encoding="utf-8-sig", newline="") as f:  #  utf-8-sig para Excel
         writer = csv.DictWriter(f, fieldnames=["title", "author"])
         writer.writeheader()
