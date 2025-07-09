@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 from sentence_transformers import SentenceTransformer
 from multiprocessing import Pool, cpu_count
@@ -49,6 +50,3 @@ if __name__ == "__main__":
     df["embedding"] = df.index.map(lambda idx: result_dict.get(idx))
     df.to_csv(OUTPUT_FILE, index=False)
     print("Embeddings guardados en:", OUTPUT_FILE)
-
-
-
