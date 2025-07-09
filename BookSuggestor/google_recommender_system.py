@@ -49,7 +49,6 @@ def search_google_books(title):
         "publishedDate": info.get("publishedDate", "")
     }
 
-
 # Generar embedding de descripción
 def generate_embedding(text):
     return model.encode(text, convert_to_numpy=True)
@@ -67,12 +66,11 @@ def add_to_database(df, book, emb):
     new_row["embedding"] = emb.tolist()
 
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-
+    df["embedding"] = df["embedding"].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
     df.to_csv(EMBEDDING_FILE, index=False, encoding="utf-8-sig")
-    print("Nuevo libro agregado a la base.")
+    #print("Nuevo libro agregado a la base.")
     return df
-
-
+  
 # Recomendador principal
 def recommend_books(query_title, df, top_n=5, save_new=True):
     print(f"\n Buscando: {query_title}")
