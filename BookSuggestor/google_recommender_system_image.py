@@ -134,11 +134,11 @@ def recommend_books(query_title, df, top_n=5, save_new=True):
     query_emb = torch.tensor(emb, dtype=torch.float32)
     embedding_tensor = torch.tensor(emb_matrix, dtype=torch.float32)
 
-    similarities = util.cos_sim(query_emb, embedding_tensor)[0].cpu().numpy()
-    sorted_indices = np.argsort(similarities)[::-1]
+    similarities = util.cos_sim(torch.tensor(query_emb).unsqueeze(0), embedding_tensor)[0].cpu().numpy()
 
-    query_index = len(df) - 1
-    filtered_indices = [i for i in sorted_indices if i != query_index][:top_n]
+    # Excluir la posición con similitud exactamente 1.0 (el propio libro)
+    sorted_indices = np.argsort(similarities)[::-1]
+    filtered_indices = [i for i in sorted_indices if similarities[i] < 0.9999][:top_n]
 
     print("\nRecomendaciones similares:\n")
     descripciones_recomendadas = []

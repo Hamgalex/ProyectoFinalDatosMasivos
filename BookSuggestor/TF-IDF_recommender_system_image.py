@@ -38,12 +38,12 @@ def fix_encoding(text):
 # === Cargar base local ===
 def load_database():
     if os.path.exists(DATA_FILE):
-        df = pd.read_csv(DATA_FILE, encoding="utf-8-sig")
+        df = pd.read_csv(DATA_FILE, encoding="utf-8")
         df["description"] = df["description"].fillna("")
-        print(f" Base cargada con {len(df)} libros.")
+        print(f"Base cargada con {len(df)} libros.")
         return df
     else:
-        print(" No se encontró archivo local. Se usará base vacía.")
+        print("No se encontró archivo local. Se usará base vacía.")
         columns = ["title", "author", "categories", "description", "language",
                    "pageCount", "averageRating", "ratingsCount", "publisher",
                    "publishedDate"]
@@ -79,7 +79,7 @@ def add_to_database(df, book):
     exists = ((df["title"].str.lower() == book["title"].lower()) &
               (df["author"].str.lower() == book["author"].lower())).any()
     if exists:
-        print(" El libro ya está en la base.")
+        print("El libro ya está en la base.")
         return df
 
     df = pd.concat([df, pd.DataFrame([book])], ignore_index=True)
@@ -106,24 +106,24 @@ def generar_nube(descripciones, nombre_base="wordcloud_tfidf.png"):
     plt.axis("off")
     plt.tight_layout()
     plt.savefig(ruta)
-    print(f" 🖼️ Nube de palabras guardada en: {ruta}")
+    print(f"Nube de palabras guardada en: {ruta}")
 
 
 # === Recomendador TF-IDF con nube ===
 def recommend_books_tfidf(query_title, df, top_n=5, save_new=True):
-    print(f"\n 🔎 Buscando: {query_title}")
+    print(f"\nBuscando: {query_title}")
     book = search_google_books(query_title)
     if not book or not book["description"]:
-        print(" ❌ Libro no encontrado o sin descripción.")
+        print("Libro no encontrado o sin descripción.")
         return df
 
-    print(f" 📘 Título: {book['title']} \n ✍️ Autor: {book['author']}\n 📝 Descripción: {book['description'][:150]}...\n")
+    print(f"Título: {book['title']}\nAutor: {book['author']}\nDescripción: {book['description'][:150]}...\n")
 
     if save_new:
         df = add_to_database(df, book)
 
     if len(df) < 2:
-        print(" ⚠️ No hay suficientes libros para comparar.")
+        print("No hay suficientes libros para comparar.")
         return df
 
     # TF-IDF
@@ -136,14 +136,16 @@ def recommend_books_tfidf(query_title, df, top_n=5, save_new=True):
     similarities = cosine_similarity(query_vec, tfidf_matrix).flatten()
 
     sorted_indices = np.argsort(similarities)[::-1]
-    filtered_indices = [i for i in sorted_indices if i != query_index][:top_n]
 
-    print(f"\n 📚 Recomendaciones similares (TF-IDF):\n")
+    # Excluir el documento con similitud más cercana a 1.0 (el mismo)
+    filtered_indices = [i for i in sorted_indices if similarities[i] < 0.9999][:top_n]
+
+    print("\nRecomendaciones similares (TF-IDF):\n")
     descripciones_recomendadas = []
 
     for i in filtered_indices:
-        print(f" 🔹 {df.loc[i, 'title']} — {df.loc[i, 'author']}")
-        print(f"     Similitud: {similarities[i]:.4f}\n")
+        print(f"{df.loc[i, 'title']} — {df.loc[i, 'author']}")
+        print(f"Similitud: {similarities[i]:.4f}\n")
         descripcion_limpia = fix_encoding(df.loc[i, "description"])
         descripciones_recomendadas.append(descripcion_limpia)
 
@@ -155,7 +157,7 @@ def recommend_books_tfidf(query_title, df, top_n=5, save_new=True):
 if __name__ == "__main__":
     base_df = load_database()
     while True:
-        query = input("\n Ingresa el título del libro (o 'salir'): ")
+        query = input("\nIngresa el título del libro (o 'salir'): ")
         if query.lower() == "salir":
             break
         base_df = recommend_books_tfidf(query, base_df, top_n=5, save_new=True)
