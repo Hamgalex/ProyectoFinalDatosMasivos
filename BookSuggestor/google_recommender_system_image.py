@@ -24,7 +24,8 @@ stop_words |= {
     "chapter", "chapters", "page", "pages", "edition", "publishing", "published",
     "libro", "libros", "novela", "novelas", "autor", "autora",
     "leer", "lectura", "leído", "escrito", "escribir",
-    "página", "páginas", "capítulo", "capítulos", "edición", "publicado", "editorial"
+    "página", "páginas", "capítulo", "capítulos", "edición", "publicado", "editorial",
+    "Â", "Ã", "ð", "œ", "â", "€", "™"
 }
 
 # === Corregir encoding mal leído ===

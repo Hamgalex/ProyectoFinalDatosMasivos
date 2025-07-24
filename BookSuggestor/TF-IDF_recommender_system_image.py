@@ -25,7 +25,8 @@ stop_words |= {
     # Español: términos editoriales y de estructura narrativa
     "libro", "libros", "novela", "novelas", "autor", "autora",
     "leer", "lectura", "leído", "escrito", "escribir",
-    "página", "páginas", "capítulo", "capítulos", "edición", "publicado", "editorial"
+    "página", "páginas", "capítulo", "capítulos", "edición", "publicado", "editorial",
+    "Â", "Ã", "ð", "œ", "â", "€", "™"
 }
 
 
